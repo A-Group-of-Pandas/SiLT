@@ -1,29 +1,50 @@
-import cv2
 import os
+
+import cv2
 import mediapipe as mp
 import numpy as np
+
 from data_processing import resize_crop, resize_pad
+
 
 def crop_hand_data(image_folder, hand_num=1):
     mpHands = mp.solutions.hands
-    hands = mpHands.Hands(static_image_mode=True,
-                        max_num_hands=hand_num,
-                        min_detection_confidence=0.5)
-    files = [file for file in os.listdir(image_folder) if not 'DS_Store' in file]
-    RGBimgs = np.array([resize_crop(cv2.flip(cv2.cvtColor(cv2.imread(f'{image_folder}/{file}'), cv2.COLOR_BGR2RGB),1)) for file in files])
-    labs = [ord(file.split('.')[0])-ord('a') for file in files]
+    hands = mpHands.Hands(
+        static_image_mode=True, max_num_hands=hand_num, min_detection_confidence=0.5
+    )
+    files = [file for file in os.listdir(image_folder) if not "DS_Store" in file]
+    RGBimgs = np.array(
+        [
+            resize_crop(
+                cv2.flip(
+                    cv2.cvtColor(
+                        cv2.imread(f"{image_folder}/{file}"), cv2.COLOR_BGR2RGB
+                    ),
+                    1,
+                )
+            )
+            for file in files
+        ]
+    )
+    labs = [ord(file.split(".")[0]) - ord("a") for file in files]
     all_results = []
     for img in RGBimgs:
         results = hands.process(img)
         if not results.multi_hand_landmarks:
             continue
         # (#hands, #landmarks, 3)
-        results_list = np.array([[[lm.x, lm.y, lm.z] for lm in hand_lms.landmark] for hand_lms in results.multi_hand_landmarks])
+        results_list = np.array(
+            [
+                [[lm.x, lm.y, lm.z] for lm in hand_lms.landmark]
+                for hand_lms in results.multi_hand_landmarks
+            ]
+        )
         all_results.append(results_list)
 
-    return np.array(all_results),labs
+    return np.array(all_results), labs
 
-#=======================================================================================================================================
+
+# =======================================================================================================================================
 # FUNCTIONS FROM HAND_CROPPER
 def crop_hand_joint(img, hands):
     # margin gives some space between the tips of fingers and the bounding box (bbox) measured in pixels
@@ -32,9 +53,15 @@ def crop_hand_joint(img, hands):
     results = hands.process(imgRGB)
     if not results.multi_hand_landmarks:
         return None
-    results = np.array([[[lm.x, lm.y, lm.z] for lm in hand_lms.landmark] for hand_lms in results.multi_hand_landmarks])
+    results = np.array(
+        [
+            [[lm.x, lm.y, lm.z] for lm in hand_lms.landmark]
+            for hand_lms in results.multi_hand_landmarks
+        ]
+    )
     del imgRGB, img
-    return results[None,...].astype(np.float32)
+    return results[None, ...].astype(np.float32)
+
 
 def crop_hand_cnn(img, hands, margin=0.07):
     # plays recording from camera and processes each image
@@ -50,20 +77,27 @@ def crop_hand_cnn(img, hands, margin=0.07):
             h, w, c = img.shape
             # here we multiply by the width and height because the landmarks are auto-normalized based on
             # the width and height of the displayed image
-            landmark_listx.append((lm.x*w))
-            landmark_listy.append((lm.y*h))
-        end = (int(max(landmark_listx))+int(margin*w), int(max(landmark_listy))+int(margin*h))
-        start = (max(0,int(min(landmark_listx))-int(margin*w)), max(0,int(min(landmark_listy))-int(margin*h)))
+            landmark_listx.append((lm.x * w))
+            landmark_listy.append((lm.y * h))
+        end = (
+            int(max(landmark_listx)) + int(margin * w),
+            int(max(landmark_listy)) + int(margin * h),
+        )
+        start = (
+            max(0, int(min(landmark_listx)) - int(margin * w)),
+            max(0, int(min(landmark_listy)) - int(margin * h)),
+        )
         cropped_img = img[start[1] : end[1], start[0] : end[0]]
         if cropped_img.shape[0] == 0 or cropped_img.shape[1] == 0:
             continue
-        #print(cropped_img.shape)
+        # print(cropped_img.shape)
         cropped_results.append(resize_pad(cropped_img))
     if len(cropped_results) == 0:
         return None
-    return np.array(cropped_results,dtype = np.float32)
+    return np.array(cropped_results, dtype=np.float32)
 
-#=======================================================================================================================================
+
+# =======================================================================================================================================
 
 
 #     while True:

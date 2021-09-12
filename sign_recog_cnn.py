@@ -13,26 +13,26 @@ class SignRecogCNN(nn.Module):
             param.requires_grad = False
         # 14*14*80
         self.dropout0 = nn.Dropout(0.0)
-        self.conv1 = nn.Conv2d(80,128,(3,3),padding='same')
+        self.conv1 = nn.Conv2d(80, 128, (3, 3), padding="same")
         self.batchnorm1 = nn.BatchNorm2d(128)
         self.dropout1 = nn.Dropout(0.0)
-        self.conv2 = nn.Conv2d(128,128,(3,3),padding='same')
+        self.conv2 = nn.Conv2d(128, 128, (3, 3), padding="same")
         self.batchnorm2 = nn.BatchNorm2d(128)
         self.dropout2 = nn.Dropout(0.0)
-        self.pool1 = nn.MaxPool2d((3,3),stride=2)
+        self.pool1 = nn.MaxPool2d((3, 3), stride=2)
         # 6*6*64
-        self.conv3 = nn.Conv2d(128,128,(3,3))
+        self.conv3 = nn.Conv2d(128, 128, (3, 3))
         self.batchnorm3 = nn.BatchNorm2d(128)
         self.dropout3 = nn.Dropout(0.0)
         # 4*4*64
-        self.conv4 = nn.Conv2d(128,196,(2,2))
+        self.conv4 = nn.Conv2d(128, 196, (2, 2))
         self.batchnorm4 = nn.BatchNorm2d(196)
         self.dropout4 = nn.Dropout(0.0)
         # 3*3*64
-        self.dense1 = nn.Linear(196,218)
+        self.dense1 = nn.Linear(196, 218)
         self.batchnorm6 = nn.BatchNorm1d(218)
         self.dropout5 = nn.Dropout(0.0)
-        self.dense2 = nn.Linear(218,26)
+        self.dense2 = nn.Linear(218, 26)
         self.relu = nn.ReLU()
 
     def forward(self, x):
@@ -42,14 +42,9 @@ class SignRecogCNN(nn.Module):
         x = self.pool1(x)
         x = self.dropout3(self.batchnorm3(self.relu(self.conv3(x))))
         x = self.dropout4(self.batchnorm4(self.relu(self.conv4(x))))
-        x = torch.max(torch.flatten(x, start_dim=2, end_dim=3),dim=2).values
+        x = torch.max(torch.flatten(x, start_dim=2, end_dim=3), dim=2).values
         x = self.dropout5(self.batchnorm6(self.relu(self.dense1(x))))
         return self.dense2(x)
-
-
-
-
-
 
 
 # class SignRecogCNN(nn.Module):
@@ -179,5 +174,3 @@ class SignRecogCNN(nn.Module):
 # 		x = self.dropout1(self.batch_norm1(self.relu(self.dense1(x))))
 # 		x = self.dense2(x)
 # 		return x
-
-	
