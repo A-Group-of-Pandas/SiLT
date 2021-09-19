@@ -1,21 +1,9 @@
 import random
-from pathlib import Path
-from typing import Union, Tuple
 import re
+from pathlib import Path
+from typing import Tuple, Union
+
 import numpy as np
-
-"""
-TO DO:
-1) Get a better corpus
-2) finish up function creation based on mygrad stuff
-3) remove non-ASL words (before randomizing) and maybe choose a very small number to not randomize
-4) build basline RNN for ASL grammar to normal english grammar
-5) look into attention mechanism based RNN and other better ways of grammar translation
-
-IDEAS: 
-- Could we use a linear parse tree parts of speech (a.k.a POS) rnn (trained with a parse tree tagged dataset) along with the grammar translator to improve preformance <https://proceedings.neurips.cc/paper/2015/file/277281aada22045c03945dcb2ca6f2ec-Paper.pdf>
-- Sometimes maybe have it pass in a perfect grammar sentence so that it learns to ignore perfect english sentences too
-"""
 
 
 def english_to_ASL(
