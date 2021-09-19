@@ -34,7 +34,7 @@ def english_to_ASL(
     with open(non_ASL_file, mode="r") as removable_words:
         removable_words = removable_words.read().lower()
 
-    # removes non-end punctuation from the corpus
+    # removes mid-sentence punctuation from the corpus
     mid_punc = """#$%&()*+,/:;<=>@[\]^_`"{|}~'"""
     corpus = corpus.translate(str.maketrans("", "", mid_punc))
 
