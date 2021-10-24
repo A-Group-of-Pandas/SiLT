@@ -14,7 +14,7 @@ def english_to_ASL(
     y_inputs_filename: Union[str, Path] = "./y_inputs_data.txt",
     x_truths_filename: Union[str, Path] = "./x_truths_data.txt",
     y_truths_filename: Union[str, Path] = "./y_truth_data.txt",
-    SPLIT_VALUE: float = 0.8,
+    percent_for_training: float = 0.8,
 ) -> Tuple[list, list, list, list]:
     """Turns a text corpus into pusedo-ASL grammar."""
 
@@ -50,11 +50,11 @@ def english_to_ASL(
     ]
 
     # this splits our data into train inputs, test inputs and train truths, test truths then turns it all into a string with each new scrambled sentence on a new line with a period at the end
-    data_split = round(len(truth_sentences) * SPLIT_VALUE)
-    X_input_sentences = ".\n".join(input_sentences[:data_split])
-    Y_input_sentences = ".\n".join(input_sentences[data_split:])
-    X_truth_sentences = ".\n".join(truth_sentences[:data_split])
-    Y_truth_sentences = ".\n".join(truth_sentences[data_split:])
+    data_split = round(len(truth_sentences) * percent_for_training)
+    X_input_sentences = "\n".join(input_sentences[:data_split])
+    Y_input_sentences = "\n".join(input_sentences[data_split:])
+    X_truth_sentences = "\n".join(truth_sentences[:data_split])
+    Y_truth_sentences = "\n".join(truth_sentences[data_split:])
 
     # removes non ASL words from the input sentences
     removable_words = removable_words.split("\n")
