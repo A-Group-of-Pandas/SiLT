@@ -1,31 +1,18 @@
 import random
 import re
 from pathlib import Path
-from typing import Tuple, Union
+
 
 import numpy as np
 
 
 def english_to_ASL(
-    *,
-    corpus_filename: Union[str, Path],
-    non_ASL_filename: Union[str, Path],
-    x_inputs_filename: Union[str, Path] = "./x_inputs_data.txt",
-    y_inputs_filename: Union[str, Path] = "./y_inputs_data.txt",
-    x_truths_filename: Union[str, Path] = "./x_truths_data.txt",
-    y_truths_filename: Union[str, Path] = "./y_truth_data.txt",
-    percent_for_training: float = 0.8,
-) -> Tuple[list, list, list, list]:
+    corpus_filename, non_ASL_filename, percent_for_training: float = 0.8
+):
     """Turns a text corpus into pusedo-ASL grammar."""
 
     corpus_file = Path(corpus_filename)
     non_ASL_file = Path(non_ASL_filename)
-
-    # x and y here refer to training and testing respectively
-    corpus_X_input_path = Path(x_inputs_filename)
-    corpus_Y_input_path = Path(y_inputs_filename)
-    corpus_X_truth_path = Path(x_truths_filename)
-    corpus_Y_truth_path = Path(y_truths_filename)
 
     # reads the corpus
     with open(corpus_file, mode="r") as corpus:
@@ -68,12 +55,7 @@ def english_to_ASL(
 non_ASL_path = Path("ASL_grammar_generation/non_ASL_words.txt")
 corpus_path = Path("ASL_grammar_generation/lung_cancer.txt")
 
-(
-    X_input_sentences,
-    Y_input_sentences,
-    X_truth_sentences,
-    Y_truth_sentences,
-) = english_to_ASL(corpus_filename=corpus_path, non_ASL_filename=non_ASL_path)
+(X_input_sentences, Y_input_sentences, X_truth_sentences, Y_truth_sentences) = english_to_ASL(corpus_filename=corpus_path, non_ASL_filename=non_ASL_path)
 
 with open("./x_input_data.txt", mode="w") as _file:
     _file.write(X_input_sentences)
