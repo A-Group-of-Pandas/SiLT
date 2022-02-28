@@ -1,10 +1,13 @@
 # query database to convert to sign language letter by letter
+import io
+import os
+
 import requests
 from bs4 import BeautifulSoup
-import io
 from moviepy.editor import VideoFileClip, concatenate_videoclips
-import os
-#from audio_processing import load_mic
+
+# from audio_processing import load_mic
+
 
 def word_query(word):
     # word = word.replace(" ", "%2B")
@@ -25,9 +28,12 @@ def word_query(word):
     except:
         try:
             import youtube_dl
+
             content = soup.find("meta", property="og:video").get("content")
-            video_link = "https://youtube.com/watch?v=" + content[content.index("embed") + 6:]
-            ydl_opts = {'outtmpl': word + '.%(ext)s'}
+            video_link = (
+                "https://youtube.com/watch?v=" + content[content.index("embed") + 6 :]
+            )
+            ydl_opts = {"outtmpl": word + ".%(ext)s"}
             with youtube_dl.YoutubeDL(ydl_opts) as ydl:
                 ydl.download([video_link])
                 print(ydl)
@@ -36,6 +42,7 @@ def word_query(word):
         except Exception as e:
             print(e)
             return "Word Not Found"
+
 
 def words_to_video(words):
     mp4_list = []
@@ -49,6 +56,7 @@ def words_to_video(words):
     video = concatenate_videoclips(mp4_list)
     video.write_videofile(words + ".mp4")
     return words + ".mp4"
+
 
 # text = load_mic()
 # words_to_video(text)
