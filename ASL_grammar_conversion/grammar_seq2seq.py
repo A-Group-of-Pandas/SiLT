@@ -23,6 +23,7 @@ def make_embeddings(embeddings_file):
 
     print(f"Found {len(embeddings_index)} word vectors.")
     return embeddings_index
+  
  
 class EncoderRNN(nn.Module):
     def __init__(self, input_size, hidden_size=50, context_size=50):
@@ -34,8 +35,6 @@ class EncoderRNN(nn.Module):
         self.lstm = nn.LSTM(input_size, hidden_size)
 
     def forward(self, input, ht, ct):
-        embedded = torch.Tensor(input).view(1, 1, -1)
-        output = embedded
         output, (ht, ct) = self.lstm(output, (ht, ct))
 
         return output, (ht, ct)
@@ -47,8 +46,9 @@ class EncoderRNN(nn.Module):
         return torch.zeros(1, 1, self.context_size)
 
 
-class DecoderRNN(nn.Module):
-    def __init__(self, output_size, hidden_size=50):
+
+class DecoderRNN:
+    def __init__(self, output_size, hidden_size=50, context_size = 50):
         # output size is sentence length
         super(DecoderRNN, self).__init__()
         
@@ -65,4 +65,3 @@ class DecoderRNN(nn.Module):
         output = self.softmax(self.out(output))
 
         return output, (ht, ct)
-        
