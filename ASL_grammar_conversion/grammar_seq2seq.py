@@ -3,8 +3,10 @@ import numpy as np
 import torch
 from torch import nn
 
-inputs_file = Path("ASL_grammar_conversion/x_input_data.txt")
-glove = Path("ASL_grammar_conversion/english_glove.txt")
+inputs_file = Path("/Users/kylenwilliams/Desktop/projects/SiLT/ASL_grammar_conversion/x_input_data.txt")
+glove = Path("/Users/kylenwilliams/Desktop/projects/SiLT/ASL_grammar_conversion/english_glove.txt")
+
+embeddings_dims = 50
 
 with open(inputs_file, mode="r") as inputs:
     raw_inputs = inputs.readlines()
@@ -26,7 +28,7 @@ def make_embeddings(embeddings_file):
   
  
 class EncoderRNN(nn.Module):
-    def __init__(self, input_size, hidden_size=50, context_size=50):
+    def __init__(self, input_size, hidden_size=embeddings_dims, context_size=embeddings_dims):
         super(EncoderRNN, self).__init__()
 
         self.hidden_size = hidden_size
@@ -35,7 +37,7 @@ class EncoderRNN(nn.Module):
         self.lstm = nn.LSTM(input_size, hidden_size)
 
     def forward(self, input, ht, ct):
-        output, (ht, ct) = self.lstm(output, (ht, ct))
+        output, (ht, ct) = self.lstm(input, (ht, ct))
 
         return output, (ht, ct)
 
@@ -47,8 +49,8 @@ class EncoderRNN(nn.Module):
 
 
 
-class DecoderRNN:
-    def __init__(self, output_size, hidden_size=50, context_size = 50):
+class DecoderRNN(nn.Module):
+    def __init__(self, output_size, hidden_size=embeddings_dims, context_size = embeddings_dims):
         # output size is sentence length
         super(DecoderRNN, self).__init__()
         
@@ -65,3 +67,4 @@ class DecoderRNN:
         output = self.softmax(self.out(output))
 
         return output, (ht, ct)
+    
