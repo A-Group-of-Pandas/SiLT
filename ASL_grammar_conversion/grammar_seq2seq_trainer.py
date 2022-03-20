@@ -21,7 +21,7 @@ def sentenceToTensor(embeddings, sentence):
     # embeddings is a dict
     sent = sentence.lower().strip()
     sent = sent.translate(str.maketrans("", "", string.punctuation))
-    tensor = [embeddings[word] if word in embeddings else torch.eye(embeddings_dims)[i] for i, word in enumerate(sent.split())]
+    tensor = [embeddings[word] if word in embeddings else torch.ones(embeddings_dims)*0.5 for word in sent.split()]
     tensor.append(EOS_TOKEN)
     
     return tensor
@@ -84,7 +84,7 @@ def train_iters(epochs, embeddings, inputs, truths, encoder, decoder, log_every=
     # loss related things
     criterion = nn.MSELoss()
     logged_loss = 0
-    avg_losses = torch.zeros(np.floor(epochs/log_every))
+    avg_losses = torch.zeros((int(np.floor(epochs/log_every))))
 
     encoder_optimizer = optim.SGD(encoder.parameters(), lr=learning_rate)
     decoder_optimizer = optim.SGD(decoder.parameters(), lr=learning_rate)
@@ -101,18 +101,19 @@ def train_iters(epochs, embeddings, inputs, truths, encoder, decoder, log_every=
                       
         loss = train(input, truth, encoder, decoder, encoder_optimizer, decoder_optimizer, criterion, embeddings)
         logged_loss += loss
-        print(logged_loss)
+        # print(logged_loss)
         
         # adds average loss of that section of epochs to a list for plotting and prints some useful info
         if epoch % log_every==0:
-            avg_losses[epoch-1] = logged_loss/log_every
-            logged_loss = 0
+            avg_losses[int(epoch/log_every)-1] = logged_loss/log_every
             
-            print(f"Epoch: {epoch} ({epoch/epochs}%) \n\t time elapsed: {(time.time() - start_time)} \n\t avg loss: {logged_loss/log_every}")
+            print(f"Epoch: {epoch} ({epoch/epochs}%) \n\t time elapsed: {(time.time() - start_time)} \n\t avg loss: {logged_loss/log_every} \n")
+            logged_loss = 0
+
 
     return encoder.state_dict(), decoder.state_dict(), avg_losses
 
-EPOCHS = 100
+EPOCHS = 113
 glove = Path("/Users/kylenwilliams/Desktop/projects/SiLT/ASL_grammar_conversion/english_glove.txt")
 
 # make embeddings
@@ -127,8 +128,14 @@ with open("/Users/kylenwilliams/Desktop/projects/SiLT/ASL_grammar_conversion/x_i
 with open("/Users/kylenwilliams/Desktop/projects/SiLT/ASL_grammar_conversion/x_truth_data.txt", mode="r") as truths:
     truths = truths.readlines()
 
+# don't forget to do validation
+
 encoder_params, decoder_params, losses = train_iters(EPOCHS, embeddings, inputs, truths, encoder, decoder)
 
+torch.save(encoder_params, "/Users/kylenwilliams/Desktop/projects/SiLT/ASL_grammar_conversion/encoder_params.pt")
+torch.save(decoder_params, "/Users/kylenwilliams/Desktop/projects/SiLT/ASL_grammar_conversion/decoder_params.pt")
+
 fig, ax = plt.subplots()
-plt.plot(list(range(EPOCHS/10)), losses)
+plt.plot(list(range((int(np.floor(EPOCHS/10))))), losses)
+plt.title("Loss")
 plt.show()

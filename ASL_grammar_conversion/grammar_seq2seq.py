@@ -3,8 +3,8 @@ import numpy as np
 import torch
 from torch import nn
 
-inputs_file = Path("/Users/kylenwilliams/Desktop/projects/SiLT/ASL_grammar_conversion/x_input_data.txt")
-glove = Path("/Users/kylenwilliams/Desktop/projects/SiLT/ASL_grammar_conversion/english_glove.txt")
+inputs_file = Path("ASL_grammar_conversion/x_input_data.txt")
+glove = Path("ASL_grammar_conversion/english_glove.txt")
 
 embeddings_dims = 50
 
